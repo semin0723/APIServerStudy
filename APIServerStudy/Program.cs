@@ -1,3 +1,4 @@
+using APIServerStudy.Middleware;
 using APIServerStudy.Repository;
 using ZLogger;
 
@@ -22,6 +23,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseMiddleware<CheckUserLoginAndLoadData>();
 
 app.UseAuthorization();
 

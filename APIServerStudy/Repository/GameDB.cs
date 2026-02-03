@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using APIServerStudy.Controllers;
+using Microsoft.Extensions.Options;
 using MySqlConnector;
 using SqlKata.Execution;
 using System.Data;
@@ -44,7 +45,15 @@ namespace APIServerStudy.Repository
                     return new Tuple<ErrorCode, long>(ErrorCode.InvalidPassword, 0);
                 }
 
-                return new Tuple<ErrorCode, long>(ErrorCode.None, 0);
+                var userLoginData = await _queryFactory.Query("gamedb.user_loginstate").
+                    Where("uid", userInfo.uid).FirstOrDefaultAsync<UserLoginState>();
+                if(userLoginData.login == true)
+                {
+                    return new Tuple<ErrorCode, long>(ErrorCode.UnKnownError, 0);
+                }
+                var result = await _queryFactory.Query("gamedb.user_loginstate").Where("uid", userInfo.uid).UpdateAsync(new { login = 1 });
+
+                return new Tuple<ErrorCode, long>(ErrorCode.None, userInfo.uid);
             }
             catch
             {
@@ -62,16 +71,64 @@ namespace APIServerStudy.Repository
                     return new Tuple<ErrorCode, long>(ErrorCode.UserAlreadyExists, 0);
                 }
 
-                var result = await _queryFactory.Query("gamedb.users").InsertAsync(new { id = userID, pw = password });
+                long? maxUid = _queryFactory.Query("gamedb.users").Max<long?>("uid");
+                if(maxUid == null)
+                {
+                    maxUid = 10000000;
+                }
+
+                long newUid = maxUid.Value + 1;
+
+                var result = await _queryFactory.Query("gamedb.users").InsertAsync(new { id = userID, pw = password, uid = newUid });
                 if(result != 1)
                 {
                     return new Tuple<ErrorCode, long>(ErrorCode.UnKnownError, 0);
                 }
-                return new Tuple<ErrorCode, long>(ErrorCode.RegistSuccess, 0);
+
+                result = await _queryFactory.Query("gamedb.user_loginstate").InsertAsync(new { uid = newUid, login = 0, lastlogindate = DateTime.UtcNow });
+                result = await _queryFactory.Query("gamedb.user_stats").InsertAsync(new { uid = newUid });
+
+                return new Tuple<ErrorCode, long>(ErrorCode.RegistSuccess, newUid);
             }
             catch
             {
                 return new Tuple<ErrorCode, long>(ErrorCode.UnKnownError, 0);
+            }
+        }
+
+        public async Task<Tuple<ErrorCode, bool>> CheckLoginState(long uid)
+        {
+            try
+            {
+                var loginState = await _queryFactory.Query("gamedb.user_loginstate").
+                    Where("uid", uid).FirstOrDefaultAsync<UserLoginState>();
+                if(loginState == null)
+                {
+                    return new Tuple<ErrorCode, bool>(ErrorCode.InvalidUserID, false);
+                }
+                return new Tuple<ErrorCode, bool>(ErrorCode.None, loginState.login);
+            }
+            catch
+            {
+                return new Tuple<ErrorCode, bool>(ErrorCode.UnKnownError, true);
+            }
+        }
+
+        public async Task<Tuple<ErrorCode, ResponseGameUserData>> GetGameUserData(long uid)
+        {
+            try
+            {
+                var gameUserData = await _queryFactory.Query("gamedb.user_stats").Where("uid", uid).FirstOrDefaultAsync<ResponseGameUserData>();
+                if(gameUserData == null)
+                {
+                    return new Tuple<ErrorCode, ResponseGameUserData>(ErrorCode.InvalidUserID, new ResponseGameUserData());
+                }
+
+                return new Tuple<ErrorCode, ResponseGameUserData>(ErrorCode.None, gameUserData);
+            }
+            catch
+            {
+                return new Tuple<ErrorCode, ResponseGameUserData>(ErrorCode.UnKnownError, new ResponseGameUserData());
             }
         }
     }
@@ -84,5 +141,19 @@ namespace APIServerStudy.Repository
     {
         public string id { get; set; }
         public string pw { get; set; }
+
+        public long uid { get; set; }
+    }
+
+    public class UserLoginState
+    {
+        public long uid { get; set; }
+        public bool login { get; set; }
+        public DateTime lastlogindate { get; set; }
+    }
+
+    public class LoginCheckUID
+    {
+        public long uid { get; set; }
     }
 }
