@@ -1,0 +1,11 @@
+@APIServerStudy_HostAddress = http://localhost:5000/api
+
+POST {{APIServerStudy_HostAddress}}/Login/
+Content-Type: application/json
+
+{
+  "UserID": "testuser",
+  "Password": "testpassword"
+}
+
+###
