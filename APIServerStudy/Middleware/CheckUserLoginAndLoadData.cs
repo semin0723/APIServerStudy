@@ -26,7 +26,8 @@ namespace APIServerStudy.Middleware
         {
             var stringValue = httpContext.Request.Path.Value;
             if(string.Compare(stringValue, "/api/Login", StringComparison.OrdinalIgnoreCase) == 0 || 
-                string.Compare(stringValue, "/api/Register", StringComparison.OrdinalIgnoreCase) == 0)
+                string.Compare(stringValue, "/api/Register", StringComparison.OrdinalIgnoreCase) == 0 ||
+                string.Compare(stringValue, "/api/Logout", StringComparison.OrdinalIgnoreCase) == 0)
             {
                 await _next(httpContext);
                 return;

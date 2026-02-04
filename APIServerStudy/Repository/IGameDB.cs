@@ -9,5 +9,7 @@ namespace APIServerStudy.Repository
 
         public Task<Tuple<ErrorCode, bool>> CheckLoginState(long uid);
         public Task<Tuple<ErrorCode, ResponseGameUserData>> GetGameUserData(long uid);
+
+        public Task<Tuple<ErrorCode, bool>> UserLogout(long uid);
     }
 }

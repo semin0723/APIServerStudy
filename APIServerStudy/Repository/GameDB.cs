@@ -51,7 +51,7 @@ namespace APIServerStudy.Repository
                 {
                     return new Tuple<ErrorCode, long>(ErrorCode.UnKnownError, 0);
                 }
-                var result = await _queryFactory.Query("gamedb.user_loginstate").Where("uid", userInfo.uid).UpdateAsync(new { login = 1 });
+                var result = await _queryFactory.Query("gamedb.user_loginstate").Where("uid", userInfo.uid).UpdateAsync(new { login = 1, lastlogindate = DateTime.UtcNow });
 
                 return new Tuple<ErrorCode, long>(ErrorCode.None, userInfo.uid);
             }
@@ -129,6 +129,24 @@ namespace APIServerStudy.Repository
             catch
             {
                 return new Tuple<ErrorCode, ResponseGameUserData>(ErrorCode.UnKnownError, new ResponseGameUserData());
+            }
+        }
+
+        public async Task<Tuple<ErrorCode, bool>> UserLogout(long uid)
+        {
+            try
+            {
+                var result = await _queryFactory.Query("gamedb.user_loginstate").
+                    Where("uid", uid).UpdateAsync(new { login = 0, lastlogindate = DateTime.UtcNow });
+                if (result != 1)
+                {
+                    return new Tuple<ErrorCode, bool>(ErrorCode.UnKnownError, false);
+                }
+                return new Tuple<ErrorCode, bool>(ErrorCode.None, true);
+            }
+            catch
+            {
+                return new Tuple<ErrorCode, bool>(ErrorCode.UnKnownError, false);
             }
         }
     }

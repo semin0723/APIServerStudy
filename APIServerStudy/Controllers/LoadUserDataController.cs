@@ -43,7 +43,6 @@ namespace APIServerStudy.Controllers
 
     public class ResponseGameUserData
     {
-        public long uid {  get; set; }
         public int maxHp { get; set; }
         public int maxMp { get; set; }
         public int attackPower { get; set; }
