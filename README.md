@@ -1,6 +1,4 @@
 # 유저 데이터 로드
-**ASP 서버 코드**
- https://github.com/semin0723/APIServerStudy/tree/UserDataLoad
 
 ## 구현 목표
 
