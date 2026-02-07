@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <Folder Include="Logs\" />
+    <Folder Include="Model\" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,6 @@
 ﻿using APIServerStudy.Controllers;
 using APIServerStudy.Repository;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
@@ -12,13 +13,13 @@ namespace APIServerStudy.Middleware
     public class CheckUserLoginAndLoadData
     {
         private readonly RequestDelegate _next;
-        private readonly IGameDB _gamedb;
+        private readonly IUserAuthDB _authDB;
         private readonly ILogger<CheckUserLoginAndLoadData> _logger;
 
-        public CheckUserLoginAndLoadData(RequestDelegate next, ILogger<CheckUserLoginAndLoadData> logger, IGameDB gameDB)
+        public CheckUserLoginAndLoadData(RequestDelegate next, ILogger<CheckUserLoginAndLoadData> logger, IUserAuthDB authDB)
         {
             _next = next;
-            _gamedb = gameDB;
+            _authDB = authDB;
             _logger = logger;
         }
 
@@ -33,17 +34,22 @@ namespace APIServerStudy.Middleware
                 return;
             }
 
-            var (isUIDExist, uidString) = await IsUIDExist(httpContext);
-            if(!isUIDExist)
+            var (isAuthTokenExist, authToken) = await GetAuthToken(httpContext);
+            if(!isAuthTokenExist)
             {
-                _logger.ZLogInformation($"[Search UserData] UID: {uidString} Not Exist.");
+                _logger.ZLogInformation($"[Check AuthToken Exist] AuthToken Not Exist.");
+                return;
+            }           
+            
+            _logger.ZLogInformation($"[Check AuthToken Exist] AuthToken: {authToken}");
+
+            if(authToken == null)
+            {
+                _logger.ZLogInformation($"[Check AuthToken Exist] AuthToken is Null.");
                 return;
             }
 
-            long uid = long.Parse(uidString);
-            _logger.ZLogInformation($"[Search UserData] UID: {uid} Search Success.");
-
-            (ErrorCode code, bool result) = await _gamedb.CheckLoginState(uid);
+            ErrorCode code = await _authDB.CheckAuthToken(authToken);
             if(code != ErrorCode.None)
             {
                 return;
@@ -52,18 +58,18 @@ namespace APIServerStudy.Middleware
             await _next(httpContext);
         }
 
-        async Task<(bool, string)> IsUIDExist(HttpContext httpContext)
+        async Task<(bool, string?)> GetAuthToken(HttpContext httpContext)
         {
-            if(httpContext.Request.Headers.TryGetValue("uid", out var uid))
+            if(httpContext.Request.Headers.TryGetValue("authToken", out var authToken))
             {
-                return (true, uid);
+                return (true, authToken);
             }
 
-            httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+            httpContext.Response.StatusCode = StatusCodes.Status203NonAuthoritative;
             var errorJsonResponse = JsonSerializer.Serialize(
                 new MiddlewareResponse
                 {
-                    result = ErrorCode.UnKnownError
+                    result = ErrorCode.AuthTokenNotMatch
                 });
             await httpContext.Response.WriteAsync(errorJsonResponse);
 

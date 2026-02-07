@@ -1,4 +1,5 @@
-﻿using APIServerStudy.Repository;
+﻿using APIServerStudy.DTO;
+using APIServerStudy.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ZLogger;
@@ -9,36 +10,26 @@ namespace APIServerStudy.Controllers
     [ApiController]
     public class RegisterController : ControllerBase
     {
-        private readonly IGameDB _gameDB;
+        private readonly IUserAuthDB _authDB;
         private readonly ILogger<RegisterController> _logger;
 
-        public RegisterController(ILogger<RegisterController> logger, IGameDB gameDB)
+        public RegisterController(ILogger<RegisterController> logger, IUserAuthDB authDB)
         {
             _logger = logger;
-            _gameDB = gameDB;
+            _authDB = authDB;
         }
 
         [HttpPost]
-        public async Task<RegisterResponse> Post(RegisterRequest request)
+        public async Task<CreateAccountResponse> Post(CreateAccountRequest request)
         {
-            _logger.ZLogInformation($"[Request Regist] ID:{request.UserID}, PW:{request.Password}");
+            _logger.ZLogInformation($"[Request Regist] ID:{request.userID}, PW:{request.password}");
 
-            (ErrorCode errorCode, long uid) = await _gameDB.RegistUser(request.UserID, request.Password); 
+            ErrorCode errorCode = await _authDB.UserRegister(request.userID, request.password); 
 
-            var response = new RegisterResponse();
+            var response = new CreateAccountResponse();
 
             response.errorCode = errorCode;
             return response;
         }
-    }
-
-    public class RegisterRequest
-    {
-        public string UserID { get; set; }
-        public string Password { get; set; }
-    }   
-    public class RegisterResponse
-    {
-        public ErrorCode errorCode { get; set; }
     }
 }

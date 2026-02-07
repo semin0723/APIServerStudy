@@ -10,6 +10,7 @@ IConfiguration configuration = builder.Configuration;
 builder.Services.Configure<DbConfig>(configuration.GetSection(nameof(DbConfig)));
 
 builder.Services.AddTransient<IGameDB, GameDB>();
+builder.Services.AddTransient<IUserAuthDB, UserAuthDB>();
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();

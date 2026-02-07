@@ -8,6 +8,9 @@
         InvalidPassword = 1001,
         UserAlreadyExists = 1002,
 
+        AuthTokenNotMatch = 8001,
+
+        RegisterFailed = 8051,
 
         UnKnownError = 9000,
     }
