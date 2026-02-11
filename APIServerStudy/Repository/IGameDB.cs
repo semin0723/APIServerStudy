@@ -1,15 +1,23 @@
 ﻿using APIServerStudy.Controllers;
+using APIServerStudy.DAO;
 
 namespace APIServerStudy.Repository
 {
     public interface IGameDB : IDisposable
     {
-        public Task<Tuple<ErrorCode, long>> AuthCheck(string userID, string password);
-        public Task<Tuple<ErrorCode, long>> RegistUser(string userID, string password);
+        // ### Auth ###
+        public Task<Tuple<ErrorCode, long>> LoginCheck(string userID, string password);
+        public Task<ErrorCode> UserRegister(string userID, string password);
+        public Task<ErrorCode> CheckAuthToken(string authToken);
 
-        public Task<Tuple<ErrorCode, bool>> CheckLoginState(long uid);
-        public Task<Tuple<ErrorCode, ResponseGameUserData>> GetGameUserData(long uid);
+        public Task<ErrorCode> RefreshAuthToken(long uid, string authToken);
+        public Task<ErrorCode> RefreshRequestTime(long uid);
+        public Task<ErrorCode> Logout(long uid);
+        // ### Auth End ###
 
-        public Task<Tuple<ErrorCode, bool>> UserLogout(long uid);
+        // ### Attendance ###
+        public Task<ErrorCode> CheckAttendance(long uid);
+        public Task<Tuple<ErrorCode, AttendanceReward>> GetAttendanceReward(int attendanceDate);
+        // ### Attendance End ###
     }
 }
