@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using MySqlConnector;
 using SqlKata.Execution;
 using System.Data;
+using ZLogger;
 
 namespace APIServerStudy.Repository
 {
@@ -17,9 +18,11 @@ namespace APIServerStudy.Repository
         private IDbConnection? _connection;
         private readonly SqlKata.Compilers.MySqlCompiler _sqlCompiler;
         private readonly QueryFactory _queryFactory;
+        private readonly ILogger<GameDB> _logger;
 
-        public GameDB(IOptions<DbConfig> dbConfig) 
-        { 
+        public GameDB(IOptions<DbConfig> dbConfig, ILogger<GameDB> logger) 
+        {
+            _logger = logger;
             _dbConfig = dbConfig;
 
             _connection = new MySqlConnection(_dbConfig.Value.GameDB);
@@ -34,20 +37,16 @@ namespace APIServerStudy.Repository
             _connection?.Close();
         }
 
-        public async Task<Tuple<ErrorCode, long>> LoginCheck(string userID, string password)
+        public async Task<(ErrorCode, GameUser?)> GetUserAccount(string userID, string password)
         {
             var userAccountData = await _queryFactory.Query("gamedb.users").Where("id", userID).FirstOrDefaultAsync<GameUser>();
+
             if (userAccountData is null)
             {
-                return new Tuple<ErrorCode, long>(ErrorCode.InvalidUserID, 0);
+                return (ErrorCode.InvalidUserID, null);
             }
 
-            if (password != userAccountData.pw)
-            {
-                return new Tuple<ErrorCode, long>(ErrorCode.InvalidPassword, 0);
-            }
-
-            return new Tuple<ErrorCode, long>(ErrorCode.None, userAccountData.uid);
+            return (ErrorCode.None, userAccountData);
         }
 
         public async Task<ErrorCode> UserRegister(string userID, string password)
@@ -74,6 +73,7 @@ namespace APIServerStudy.Repository
             }
             catch (Exception ex)
             {
+                _logger.ZLogInformation($"[DB ExceptionError] Error: {ex}");
                 transaction.Rollback();
                 return ErrorCode.RegisterFailed;
             }

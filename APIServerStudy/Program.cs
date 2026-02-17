@@ -1,5 +1,6 @@
 using APIServerStudy.Middleware;
 using APIServerStudy.Repository;
+using APIServerStudy.Services;
 using ZLogger;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,7 +11,9 @@ IConfiguration configuration = builder.Configuration;
 builder.Services.Configure<DbConfig>(configuration.GetSection(nameof(DbConfig)));
 
 builder.Services.AddTransient<IGameDB, GameDB>();
-builder.Services.AddTransient<IUserAuthDB, UserAuthDB>();
+
+/// Services ///
+builder.Services.AddTransient<IAuthService, AuthService>();
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
@@ -26,6 +29,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<CheckUserLoginAndLoadData>();
+app.UseMiddleware<GlobalExceptionHandler>();
 
 app.UseAuthorization();
 

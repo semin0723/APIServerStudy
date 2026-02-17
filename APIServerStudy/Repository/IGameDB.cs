@@ -6,7 +6,7 @@ namespace APIServerStudy.Repository
     public interface IGameDB : IDisposable
     {
         // ### Auth ###
-        public Task<Tuple<ErrorCode, long>> LoginCheck(string userID, string password);
+        public Task<(ErrorCode, GameUser?)> GetUserAccount(string userID, string password);
         public Task<ErrorCode> UserRegister(string userID, string password);
         public Task<ErrorCode> CheckAuthToken(string authToken);
 
@@ -16,8 +16,8 @@ namespace APIServerStudy.Repository
         // ### Auth End ###
 
         // ### Attendance ###
-        public Task<ErrorCode> CheckAttendance(long uid);
-        public Task<Tuple<ErrorCode, AttendanceReward>> GetAttendanceReward(int attendanceDate);
+        public Task<(ErrorCode, UserAttendanceInfo?)> GetAttendance(long uid);
+        public Task<(ErrorCode, AttendanceReward?)> GetAttendanceReward(int attendanceDate);
         // ### Attendance End ###
     }
 }

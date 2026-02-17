@@ -1,5 +1,6 @@
 ﻿using APIServerStudy.DTO;
 using APIServerStudy.Repository;
+using APIServerStudy.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ZLogger;
@@ -10,12 +11,12 @@ namespace APIServerStudy.Controllers
     [ApiController]
     public class LogoutController : ControllerBase
     {
-        private readonly IUserAuthDB _authDB;
+        private readonly IAuthService _authService;
         private readonly ILogger<LogoutController> _logger;
 
-        public LogoutController(IUserAuthDB authDB, ILogger<LogoutController> logger)
+        public LogoutController(IAuthService authService, ILogger<LogoutController> logger)
         {
-            _authDB = authDB;
+            _authService = authService;
             _logger = logger;
         }
 
@@ -24,7 +25,7 @@ namespace APIServerStudy.Controllers
         {
             _logger.ZLogInformation($"[Request Logout] uid: {logoutRequest.uid}");
 
-            ErrorCode code = await _authDB.Logout(logoutRequest.uid);
+            ErrorCode code = await _authService.Logout(logoutRequest.uid);
 
             return;
         }

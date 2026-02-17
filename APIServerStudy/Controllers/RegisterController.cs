@@ -1,5 +1,6 @@
 ﻿using APIServerStudy.DTO;
 using APIServerStudy.Repository;
+using APIServerStudy.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ZLogger;
@@ -10,13 +11,13 @@ namespace APIServerStudy.Controllers
     [ApiController]
     public class RegisterController : ControllerBase
     {
-        private readonly IUserAuthDB _authDB;
+        private readonly IAuthService _authService;
         private readonly ILogger<RegisterController> _logger;
 
-        public RegisterController(ILogger<RegisterController> logger, IUserAuthDB authDB)
+        public RegisterController(ILogger<RegisterController> logger, IAuthService authService)
         {
             _logger = logger;
-            _authDB = authDB;
+            _authService = authService;
         }
 
         [HttpPost]
@@ -24,7 +25,7 @@ namespace APIServerStudy.Controllers
         {
             _logger.ZLogInformation($"[Request Regist] ID:{request.userID}, PW:{request.password}");
 
-            ErrorCode errorCode = await _authDB.UserRegister(request.userID, request.password); 
+            ErrorCode errorCode = await _authService.RegisterUser(request.userID, request.password); 
 
             var response = new CreateAccountResponse();
 

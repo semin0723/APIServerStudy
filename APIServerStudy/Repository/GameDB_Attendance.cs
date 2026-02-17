@@ -3,22 +3,33 @@ using Microsoft.Extensions.Options;
 using MySqlConnector;
 using SqlKata.Execution;
 using System.Data;
+using ZLogger;
 
 namespace APIServerStudy.Repository;
 
 public partial class GameDB
 {    
-    public async Task<ErrorCode> CheckAttendance(long uid)
+    public async Task<(ErrorCode, UserAttendanceInfo?)> GetAttendance(long uid)
     {
         var userAttendanceInfo = await _queryFactory.Query("gamedb.user_attendance").Where("uid", uid).FirstOrDefaultAsync<UserAttendanceInfo>();
-        if(userAttendanceInfo == null)
+
+        if (userAttendanceInfo == null)
         {
-            return ErrorCode.InvalidUserID;
+            return (ErrorCode.InvalidUserID, null);
         }
 
-        int lastAttendanceMonth = userAttendanceInfo.lastAttendance.Month;
-        int lastAttendanceDay = userAttendanceInfo.lastAttendance.Day;
+        return (ErrorCode.None, userAttendanceInfo);
+    }
 
-        return ErrorCode.None;
+    public async Task<(ErrorCode, AttendanceReward?)> GetAttendanceReward(int attendanceDate)
+    {
+        var reward = await _queryFactory.Query("gamedb.master_reward_attendance").Where("attendancedate", attendanceDate).FirstOrDefaultAsync<AttendanceReward>();
+        
+        if (reward == null)
+        {
+            return (ErrorCode.InvalidAttendanceDate, null);
+        }
+
+        return (ErrorCode.None, reward);
     }
 }

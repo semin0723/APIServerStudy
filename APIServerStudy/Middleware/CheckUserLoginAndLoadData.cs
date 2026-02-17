@@ -13,13 +13,13 @@ namespace APIServerStudy.Middleware
     public class CheckUserLoginAndLoadData
     {
         private readonly RequestDelegate _next;
-        private readonly IUserAuthDB _authDB;
+        private readonly IGameDB _gameDB;
         private readonly ILogger<CheckUserLoginAndLoadData> _logger;
 
-        public CheckUserLoginAndLoadData(RequestDelegate next, ILogger<CheckUserLoginAndLoadData> logger, IUserAuthDB authDB)
+        public CheckUserLoginAndLoadData(RequestDelegate next, ILogger<CheckUserLoginAndLoadData> logger, IGameDB gameDB)
         {
             _next = next;
-            _authDB = authDB;
+            _gameDB = gameDB;
             _logger = logger;
         }
 
@@ -49,7 +49,7 @@ namespace APIServerStudy.Middleware
                 return;
             }
 
-            ErrorCode code = await _authDB.CheckAuthToken(authToken);
+            ErrorCode code = await _gameDB.CheckAuthToken(authToken);
             if(code != ErrorCode.None)
             {
                 return;

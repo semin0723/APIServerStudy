@@ -1,5 +1,6 @@
 ﻿using APIServerStudy.DTO;
 using APIServerStudy.Repository;
+using APIServerStudy.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ZLogger;
@@ -10,13 +11,15 @@ namespace APIServerStudy.Controllers
     [ApiController]
     public class LoginController : ControllerBase
     {
-        private readonly IUserAuthDB _authDB;
+        private readonly IAuthService _authService;
+        private readonly IGameDB _gameDB;
         private readonly ILogger<LoginController> _logger;
 
-        public LoginController(ILogger<LoginController> logger, IUserAuthDB authDB)
+        public LoginController(ILogger<LoginController> logger, IAuthService authService, IGameDB gameDB)
         {
             _logger = logger;
-            _authDB = authDB;
+            _authService = authService;
+            _gameDB = gameDB;
         }
 
         [HttpPost]
@@ -26,7 +29,7 @@ namespace APIServerStudy.Controllers
             var response = new LoginResponse();
 
             // DB Check Has User and Send Result.
-            (ErrorCode errorCode, long uid) = await _authDB.LoginCheck(request.userID, request.password);
+            (ErrorCode errorCode, long uid) = await _authService.LoginCheck(request.userID, request.password);
 
             response.errorCode = errorCode;
 
@@ -36,31 +39,7 @@ namespace APIServerStudy.Controllers
                 return response;
             }
 
-            string authToken = CreateToken();
-            response.authToken = authToken;
-            response.uid = uid;
-
-            errorCode = await _authDB.RefreshAuthToken(uid, authToken);
-
             return response;
-        }
-
-        private string tokenElement = "0123456789abcdefghijklmnopqrstuvwxyz";
-        string CreateToken()
-        {
-            byte[] tokenByte = new byte[16];
-            Random random = new Random();
-            random.NextBytes(tokenByte);
-
-            string authToken = "";
-
-            foreach (byte b in tokenByte)
-            {
-                int index = b % tokenElement.Length;
-                authToken += tokenElement[index];
-            }
-
-            return authToken;
         }
     }
 }
