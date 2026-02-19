@@ -12,10 +12,10 @@ namespace APIServerStudy.Controllers
     public class LoginController : ControllerBase
     {
         private readonly IAuthService _authService;
-        private readonly IGameDB _gameDB;
+        private readonly IDB _gameDB;
         private readonly ILogger<LoginController> _logger;
 
-        public LoginController(ILogger<LoginController> logger, IAuthService authService, IGameDB gameDB)
+        public LoginController(ILogger<LoginController> logger, IAuthService authService, IDB gameDB)
         {
             _logger = logger;
             _authService = authService;
@@ -29,9 +29,11 @@ namespace APIServerStudy.Controllers
             var response = new LoginResponse();
 
             // DB Check Has User and Send Result.
-            (ErrorCode errorCode, long uid) = await _authService.LoginCheck(request.userID, request.password);
+            (ErrorCode errorCode, long uid, string authToken) = await _authService.LoginCheck(request.userID, request.password);
 
             response.errorCode = errorCode;
+            response.uid = uid;
+            response.authToken = authToken;
 
             if (errorCode != ErrorCode.None)
             {

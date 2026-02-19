@@ -12,15 +12,15 @@ namespace APIServerStudy.Repository
         public string GameDB { get; set; }
     }
 
-    public partial class GameDB : IGameDB
+    public partial class DB : IDB
     {
         private readonly IOptions<DbConfig> _dbConfig;
         private IDbConnection? _connection;
         private readonly SqlKata.Compilers.MySqlCompiler _sqlCompiler;
         private readonly QueryFactory _queryFactory;
-        private readonly ILogger<GameDB> _logger;
+        private readonly ILogger<DB> _logger;
 
-        public GameDB(IOptions<DbConfig> dbConfig, ILogger<GameDB> logger) 
+        public DB(IOptions<DbConfig> dbConfig, ILogger<DB> logger) 
         {
             _logger = logger;
             _dbConfig = dbConfig;
@@ -51,17 +51,17 @@ namespace APIServerStudy.Repository
 
         public async Task<ErrorCode> UserRegister(string userID, string password)
         {
+            var userData = await _queryFactory.Query("gamedb.users").Where("id", userID).FirstOrDefaultAsync<GameUser>();
+            if (userData != null)
+            {
+                return ErrorCode.UserAlreadyExists;
+            }
+
             var transaction = _connection.BeginTransaction();
 
             try
             {
-                var userExist = await _queryFactory.Query("gamedb.users").Where("id", userID).ExistsAsync();
-                if (userExist)
-                {
-                    return ErrorCode.UserAlreadyExists;
-                }
-
-                var newUid = await _queryFactory.Query("gamedb.users").InsertGetIdAsync<long>(new { id = userID, pw = password });
+                var newUid = await _queryFactory.Query("gamedb.users").InsertGetIdAsync<long>(new { id = userID, pw = password }, transaction : transaction);
 
                 await _queryFactory.Query("gamedb.user_loginstate").InsertAsync(new { uid = newUid }, transaction: transaction);
                 await _queryFactory.Query("gamedb.user_attendance").InsertAsync(new { uid = newUid }, transaction: transaction);

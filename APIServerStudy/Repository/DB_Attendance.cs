@@ -7,7 +7,7 @@ using ZLogger;
 
 namespace APIServerStudy.Repository;
 
-public partial class GameDB
+public partial class DB
 {    
     public async Task<(ErrorCode, UserAttendanceInfo?)> GetAttendance(long uid)
     {

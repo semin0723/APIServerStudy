@@ -3,7 +3,7 @@ using APIServerStudy.DAO;
 
 namespace APIServerStudy.Repository
 {
-    public interface IGameDB : IDisposable
+    public interface IDB : IDisposable
     {
         // ### Auth ###
         public Task<(ErrorCode, GameUser?)> GetUserAccount(string userID, string password);
@@ -14,6 +14,12 @@ namespace APIServerStudy.Repository
         public Task<ErrorCode> RefreshRequestTime(long uid);
         public Task<ErrorCode> Logout(long uid);
         // ### Auth End ###
+
+        // ### DataLoad ###
+        public Task<(ErrorCode, List<AttendanceReward>)> LoadAttendanceReward();
+        public Task<(ErrorCode, UserGoodsData?)> LoadUserGoodsData(long uid);
+
+        // ### DataLoad End ###
 
         // ### Attendance ###
         public Task<(ErrorCode, UserAttendanceInfo?)> GetAttendance(long uid);

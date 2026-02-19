@@ -13,10 +13,10 @@ namespace APIServerStudy.Middleware
     public class CheckUserLoginAndLoadData
     {
         private readonly RequestDelegate _next;
-        private readonly IGameDB _gameDB;
+        private readonly IDB _gameDB;
         private readonly ILogger<CheckUserLoginAndLoadData> _logger;
 
-        public CheckUserLoginAndLoadData(RequestDelegate next, ILogger<CheckUserLoginAndLoadData> logger, IGameDB gameDB)
+        public CheckUserLoginAndLoadData(RequestDelegate next, ILogger<CheckUserLoginAndLoadData> logger, IDB gameDB)
         {
             _next = next;
             _gameDB = gameDB;
@@ -48,6 +48,8 @@ namespace APIServerStudy.Middleware
                 _logger.ZLogInformation($"[Check AuthToken Exist] AuthToken is Null.");
                 return;
             }
+
+
 
             ErrorCode code = await _gameDB.CheckAuthToken(authToken);
             if(code != ErrorCode.None)

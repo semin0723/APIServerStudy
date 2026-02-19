@@ -2,12 +2,12 @@
 
 public class UserAttendanceInfo
 {
-    public DateTime lastAttendance {  get; set; }
-    public int attendanceCount { get; set; }
+    public DateTime last_attendance {  get; set; }
+    public int attendance_count { get; set; }
 }
 
 public class AttendanceReward
 {
-    public int rewardID {  get; set; }
-    public int rewardAmount { get; set; }
+    public int reward_id {  get; set; }
+    public int reward_amount { get; set; }
 }

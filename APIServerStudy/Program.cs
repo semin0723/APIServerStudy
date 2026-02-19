@@ -10,10 +10,11 @@ var builder = WebApplication.CreateBuilder(args);
 IConfiguration configuration = builder.Configuration;
 builder.Services.Configure<DbConfig>(configuration.GetSection(nameof(DbConfig)));
 
-builder.Services.AddTransient<IGameDB, GameDB>();
+builder.Services.AddTransient<IDB, DB>();
 
 /// Services ///
 builder.Services.AddTransient<IAuthService, AuthService>();
+builder.Services.AddTransient<IUserDataLoadService, UserDataLoadService>();
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();

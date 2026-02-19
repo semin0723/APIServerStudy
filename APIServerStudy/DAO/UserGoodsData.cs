@@ -1,7 +1,6 @@
-﻿namespace APIServerStudy.DAO
+﻿namespace APIServerStudy.DAO;
+
+public class UserGoodsData
 {
-    public class UserGoodsData
-    {
-        public int credit {  get; set; }
-    }
+    public int credit {  get; set; }
 }

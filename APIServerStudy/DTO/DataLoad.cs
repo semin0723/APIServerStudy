@@ -9,5 +9,8 @@ public class DataLoadRequest
 
 public class DataLoadResponse
 {
-    UserGoodsData goodsData { get; set; }
+    public ErrorCode errorCode { get; set; }
+    public bool canAttendance { get; set; }
+    public List<AttendanceReward> attendanceRewards { get; set; }
+    public UserGoodsData goodsData { get; set; }
 }
