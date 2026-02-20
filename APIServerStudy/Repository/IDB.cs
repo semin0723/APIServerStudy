@@ -17,6 +17,7 @@ namespace APIServerStudy.Repository
 
         // ### DataLoad ###
         public Task<(ErrorCode, List<AttendanceReward>)> LoadAttendanceReward();
+        public Task<(ErrorCode, List<UpgradeData>)> LoadUpgradeData();
         public Task<(ErrorCode, UserGoodsData?)> LoadUserGoodsData(long uid);
 
         // ### DataLoad End ###
@@ -25,5 +26,14 @@ namespace APIServerStudy.Repository
         public Task<(ErrorCode, UserAttendanceInfo?)> GetAttendance(long uid);
         public Task<(ErrorCode, AttendanceReward?)> GetAttendanceReward(int attendanceDate);
         // ### Attendance End ###
+
+        // ### Game Data ###
+        public Task<(ErrorCode, UpgradeData?)> GetUpgradeData(int upgradeID);
+        public Task<(ErrorCode, int)> GetUserUpgradeLevel(long uid, int upgradeID);
+        public Task<(ErrorCode, int)> GetUserCredit(long uid);
+        public Task<ErrorCode> UpdateUserData(long uid, int credit, int upgradeID, int level, bool isUnlock);
+       
+
+        // ### Game Data End ###
     }
 }

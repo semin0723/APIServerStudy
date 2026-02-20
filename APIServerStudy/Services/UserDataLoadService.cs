@@ -28,6 +28,13 @@ public class UserDataLoadService : IUserDataLoadService
             return (errorCode, null);
         }
 
+        (errorCode, var masterUpgradeData) = await _gameDB.LoadUpgradeData();
+        if (userAttendanceInfo == null)
+        {
+            _logger.ZLogInformation($"[Load Data] UID: {uid}, master upgrade data not exist.");
+            return (errorCode, null);
+        }
+
         (errorCode, var userGoodsData) = await _gameDB.LoadUserGoodsData(uid);
         if(userGoodsData == null)
         {
@@ -47,6 +54,8 @@ public class UserDataLoadService : IUserDataLoadService
         {
             errorCode = errorCode,
             attendanceRewards = masterAttendanceRewards,
+            attendanceCount = userAttendanceInfo.attendance_count,
+            upgradeData = masterUpgradeData,
             canAttendance = alreadyAttendance,
             goodsData = userGoodsData
         });

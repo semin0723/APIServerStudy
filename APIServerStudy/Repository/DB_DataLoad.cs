@@ -12,6 +12,13 @@ public partial class DB
         return (ErrorCode.None, rewards);
     }
 
+    public async Task<(ErrorCode, List<UpgradeData>)> LoadUpgradeData()
+    {
+        var upgradeDataList = await _queryFactory.Query("gamedb.master_upgrade").GetAsync<UpgradeData>();
+        List<UpgradeData> upgrades = upgradeDataList.ToList();
+        return (ErrorCode.None, upgrades);
+    }
+
     public async Task<(ErrorCode, UserGoodsData?)> LoadUserGoodsData(long uid)
     {
         var userGoodsData = await _queryFactory.Query("gamedb.users").Where("uid", uid).FirstOrDefaultAsync<UserGoodsData>();
