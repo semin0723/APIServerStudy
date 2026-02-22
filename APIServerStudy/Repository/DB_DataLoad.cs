@@ -14,7 +14,7 @@ public partial class DB
 
     public async Task<(ErrorCode, List<UpgradeData>)> LoadUpgradeData()
     {
-        var upgradeDataList = await _queryFactory.Query("gamedb.master_upgrade").GetAsync<UpgradeData>();
+        var upgradeDataList = await _queryFactory.Query("gamedb.master_upgrade_list").GetAsync<UpgradeData>();
         List<UpgradeData> upgrades = upgradeDataList.ToList();
         return (ErrorCode.None, upgrades);
     }

@@ -32,4 +32,15 @@ public partial class DB
 
         return (ErrorCode.None, reward);
     }
+
+    public async Task<ErrorCode> UpdateAttendance(long uid, int attendanceDate)
+    {
+        var result = await _queryFactory.Query("gamedb.user_attendance").Where("uid", uid).UpdateAsync(new { attendance_count = attendanceDate, last_attendance = DateTime.Now });
+        if (result == 0)
+        {
+            return ErrorCode.UpdateFailed;
+        }
+        return ErrorCode.None;
+
+    }
 }

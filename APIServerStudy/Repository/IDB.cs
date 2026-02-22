@@ -25,6 +25,7 @@ namespace APIServerStudy.Repository
         // ### Attendance ###
         public Task<(ErrorCode, UserAttendanceInfo?)> GetAttendance(long uid);
         public Task<(ErrorCode, AttendanceReward?)> GetAttendanceReward(int attendanceDate);
+        public Task<ErrorCode> UpdateAttendance(long uid, int attendanceDate);
         // ### Attendance End ###
 
         // ### Game Data ###

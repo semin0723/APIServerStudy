@@ -15,6 +15,8 @@ builder.Services.AddTransient<IDB, DB>();
 /// Services ///
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IUserDataLoadService, UserDataLoadService>();
+builder.Services.AddTransient<IAttendanceService, AttendanceService>();
+builder.Services.AddTransient<IUpgradeService, UpgradeService>();
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();

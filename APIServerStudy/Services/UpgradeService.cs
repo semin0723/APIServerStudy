@@ -4,7 +4,7 @@ using APIServerStudy.Repository;
 
 namespace APIServerStudy.Services;
 
-public class UpgradeService
+public class UpgradeService : IUpgradeService
 {
     private readonly IDB _gameDB;
     private readonly ILogger<UpgradeService> _logger;

@@ -56,7 +56,7 @@ public class UserDataLoadService : IUserDataLoadService
             attendanceRewards = masterAttendanceRewards,
             attendanceCount = userAttendanceInfo.attendance_count,
             upgradeData = masterUpgradeData,
-            canAttendance = alreadyAttendance,
+            canAttendance = !alreadyAttendance,
             goodsData = userGoodsData
         });
     }
