@@ -32,6 +32,30 @@ namespace APIServerStudy.Repository
             _queryFactory = new QueryFactory(_connection, _sqlCompiler);
         }
 
+        public async Task<ErrorCode> Transaction(Func<IDbTransaction, Task<ErrorCode>> transactionOperator)
+        {
+            var transaction = _connection?.BeginTransaction();
+
+            try
+            {
+                var errorCode = await transactionOperator(transaction);
+                if(errorCode != ErrorCode.None)
+                {
+                    transaction.Rollback();
+                    return errorCode;
+                }
+
+                transaction.Commit();
+                return errorCode;
+            }
+            catch (Exception ex)
+            {
+                _logger.ZLogInformation($"[DB ExceptionError] Error: {ex}");
+                transaction.Rollback();
+                return ErrorCode.DBTransactionError;
+            }
+        }
+
         public void Dispose()
         {
             _connection?.Close();

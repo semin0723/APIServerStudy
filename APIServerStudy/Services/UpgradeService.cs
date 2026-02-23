@@ -18,6 +18,8 @@ public class UpgradeService : IUpgradeService
 
     public async Task<(ErrorCode, UpgradeResponse?)> Upgrade(long uid, int upgradeID, int currentLevel)
     {
+        int nextLevel = currentLevel + 1;
+
         (ErrorCode errorCode, var upgradeInfo) = await _gameDB.GetMasterUpgradeData(upgradeID);
         if(errorCode != ErrorCode.None)
         {
@@ -35,12 +37,6 @@ public class UpgradeService : IUpgradeService
         (errorCode, var upgradeLevel) = await _gameDB.GetUserUpgradeLevel(uid, upgradeID);
         if (errorCode == ErrorCode.DataNotFound)
         {
-            if(upgradeLevel != currentLevel)
-            {
-                _logger.ZLogError($"Failed to upgrade for uid: {uid}, upgradeID: {upgradeID}. ErrorCode: {ErrorCode.UpgradeLevelMismatch}");
-                return (ErrorCode.UpgradeLevelMismatch, null);
-            }
-
             int requiredCredit = upgradeInfo.open_cost;
             if(requiredCredit > userCredit)
             {
@@ -49,7 +45,7 @@ public class UpgradeService : IUpgradeService
             }
 
             int newCredit = userCredit - requiredCredit;
-            errorCode = await _gameDB.UpdateUserUpgradeData(uid, newCredit, upgradeID, 1, true);
+            errorCode = await _gameDB.UpdateUserUpgradeData(uid, newCredit, upgradeID, nextLevel, true);
 
             if (errorCode != ErrorCode.None)
             {
@@ -60,12 +56,18 @@ public class UpgradeService : IUpgradeService
             return (ErrorCode.None, new UpgradeResponse
             {
                 errorCode = ErrorCode.None,
-                currentLevel = 1,
+                currentLevel = nextLevel,
                 currentCredit = newCredit
             });
         }
         else
         {
+            if (upgradeLevel != currentLevel)
+            {
+                _logger.ZLogError($"Failed to upgrade for uid: {uid}, upgradeID: {upgradeID}. ErrorCode: {ErrorCode.UpgradeLevelMismatch}");
+                return (ErrorCode.UpgradeLevelMismatch, null);
+            }
+
             int requiredCredit = upgradeInfo.addcost_per_level * currentLevel;
             if (requiredCredit > userCredit)
             {
@@ -74,7 +76,7 @@ public class UpgradeService : IUpgradeService
             }
 
             int newCredit = userCredit - requiredCredit;
-            errorCode = await _gameDB.UpdateUserUpgradeData(uid, newCredit, upgradeID, currentLevel + 1, false);
+            errorCode = await _gameDB.UpdateUserUpgradeData(uid, newCredit, upgradeID, nextLevel, false);
             if (errorCode != ErrorCode.None)
             {
                 _logger.ZLogError($"Failed to update user data for uid: {uid} after upgrade. ErrorCode: {errorCode}");
@@ -84,7 +86,7 @@ public class UpgradeService : IUpgradeService
             return (ErrorCode.None, new UpgradeResponse
             {
                 errorCode = ErrorCode.None,
-                currentLevel = currentLevel + 1,
+                currentLevel = nextLevel,
                 currentCredit = newCredit
             });
         }

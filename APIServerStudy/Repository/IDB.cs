@@ -1,10 +1,15 @@
 ﻿using APIServerStudy.Controllers;
 using APIServerStudy.DAO;
+using System.Data;
 
 namespace APIServerStudy.Repository
 {
     public interface IDB : IDisposable
     {
+        // ### Transaction ###
+        public Task<ErrorCode> Transaction(Func<IDbTransaction, Task<ErrorCode>> transactionOperator);
+        // ### Transaction End ###
+
         // ### Auth ###
         public Task<(ErrorCode, GameUser?)> GetUserAccount(string userID, string password);
         public Task<ErrorCode> UserRegister(string userID, string password);
@@ -33,6 +38,7 @@ namespace APIServerStudy.Repository
         public Task<(ErrorCode, int)> GetUserUpgradeLevel(long uid, int upgradeID);
         public Task<(ErrorCode, int)> GetUserCredit(long uid);
         public Task<ErrorCode> UpdateUserUpgradeData(long uid, int credit, int upgradeID, int level, bool isUnlock);
+        public Task<ErrorCode> UpdateUserCredit(long uid, int credit, IDbTransaction transaction);
        
 
         // ### Game Data End ###

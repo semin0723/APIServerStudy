@@ -20,5 +20,6 @@
         NotEnoughCredit = 5001,
 
         UnKnownError = 9000,
+        DBTransactionError = 9001,
     }
 }

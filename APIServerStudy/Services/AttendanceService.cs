@@ -1,5 +1,6 @@
 ﻿using APIServerStudy.DTO;
 using APIServerStudy.Repository;
+using System.Data;
 using ZLogger;
 
 namespace APIServerStudy.Services;
@@ -44,7 +45,35 @@ public class AttendanceService : IAttendanceService
             return (ErrorCode.DataNotFound, null);
         }
 
-        (errorCode) = await _gameDB.UpdateAttendance(uid, attendanceDay);
+        (errorCode, var userCredit) = await _gameDB.GetUserCredit(uid);
+        if(errorCode != ErrorCode.None)
+        {
+            _logger.ZLogInformation($"[Attendance] Error: Failed to Get User Credit, UID: {uid}");
+            return (errorCode, null);
+        }
+
+        int newCredit = userCredit + reward.reward_amount;
+
+        errorCode = await _gameDB.Transaction(
+            async (IDbTransaction transaction) =>
+            {
+                ErrorCode errorCode = await _gameDB.UpdateAttendance(uid, attendanceDay);
+                if(errorCode != ErrorCode.None)
+                {
+                    _logger.ZLogInformation($"[Attendance] Error: Failed to Update Attendance Info, UID: {uid}, AttendanceDay: {attendanceDay}");
+                    return errorCode;
+                }
+
+                errorCode = await _gameDB.UpdateUserCredit(uid, newCredit, transaction);
+                if (errorCode != ErrorCode.None)
+                {
+                    _logger.ZLogInformation($"[Attendance] Error: Failed to Update User Credit, UID: {uid}, NewCredit: {newCredit}");
+                    return errorCode;
+                }
+
+                return ErrorCode.None;
+            });
+
         if(errorCode != ErrorCode.None)
         {
             _logger.ZLogInformation($"[Attendance] Error: Failed to Update Attendance Info, UID: {uid}, AttendanceDay: {attendanceDay}");

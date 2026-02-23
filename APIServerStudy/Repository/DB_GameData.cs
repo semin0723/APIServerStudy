@@ -1,5 +1,6 @@
 ﻿using APIServerStudy.DAO;
 using SqlKata.Execution;
+using System.Data;
 using ZLogger;
 
 namespace APIServerStudy.Repository;
@@ -68,5 +69,17 @@ public partial class DB
             transaction.Rollback();
             return ErrorCode.UpdateFailed;
         }
+    }
+
+    public async Task<ErrorCode> UpdateUserCredit(long uid, int credit, IDbTransaction transaction)
+    {
+        var result = await _queryFactory.Query("gamedb.user_goods").
+                Where("uid", uid).
+                UpdateAsync(new { credit = credit }, transaction: transaction);
+        if (result != 1)
+        {
+            return ErrorCode.UpdateFailed;
+        }
+        return ErrorCode.None;
     }
 }
