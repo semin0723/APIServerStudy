@@ -29,10 +29,10 @@ namespace APIServerStudy.Repository
         // ### Attendance End ###
 
         // ### Game Data ###
-        public Task<(ErrorCode, UpgradeData?)> GetUpgradeData(int upgradeID);
+        public Task<(ErrorCode, UpgradeData?)> GetMasterUpgradeData(int upgradeID);
         public Task<(ErrorCode, int)> GetUserUpgradeLevel(long uid, int upgradeID);
         public Task<(ErrorCode, int)> GetUserCredit(long uid);
-        public Task<ErrorCode> UpdateUserData(long uid, int credit, int upgradeID, int level, bool isUnlock);
+        public Task<ErrorCode> UpdateUserUpgradeData(long uid, int credit, int upgradeID, int level, bool isUnlock);
        
 
         // ### Game Data End ###

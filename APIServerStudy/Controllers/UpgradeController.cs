@@ -30,17 +30,5 @@ namespace APIServerStudy.Controllers
             }
             return new UpgradeResponse { errorCode = code };
         }
-
-        [HttpPost]
-        public async Task<UnlockUpgradeResponse> Post(UnlockUpgradeRequest request)
-        {
-            _logger.ZLogInformation($"[Request Upgrade] UID: {request.uid}, UpgradeID: {request.upgradeID}");
-            (ErrorCode code, var unlockResult) = await _upgradeService.UnlockUpgrade(request.uid, request.upgradeID);
-            if (code == ErrorCode.None)
-            {
-                return unlockResult;
-            }
-            return new UnlockUpgradeResponse { errorCode = code };
-        }
     }
 }

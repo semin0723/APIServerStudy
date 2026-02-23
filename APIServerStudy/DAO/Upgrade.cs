@@ -12,3 +12,9 @@ public class UpgradeData
     public double addstat_per_level { get; set; }
     public string add_type { get; set; }
 }
+
+public class UserUpgradeData
+{
+    public int upgrade_id { get; set; }
+    public int upgrade_level { get; set; }
+}

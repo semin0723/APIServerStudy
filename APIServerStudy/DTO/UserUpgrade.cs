@@ -13,15 +13,3 @@ public class UpgradeResponse
     public int currentLevel { get; set; }
     public int currentCredit { get; set; }
 }
-
-public class UnlockUpgradeRequest
-{
-    public long uid { get; set; }
-    public int upgradeID { get; set; }
-}
-
-public class UnlockUpgradeResponse
-{
-    public ErrorCode errorCode { get; set; }
-    public int currentCredit { get; set; }
-}

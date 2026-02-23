@@ -51,8 +51,6 @@ public class AttendanceService : IAttendanceService
             return (errorCode, null);
         }
 
-
-
         _logger.ZLogInformation($"[Attendance] Success, UID: {uid}, AttendanceDay: {attendanceDay}, Reward: {reward}");
         return (ErrorCode.None, new AttendanceResponse
         {

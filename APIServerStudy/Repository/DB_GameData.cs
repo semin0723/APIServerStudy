@@ -6,9 +6,9 @@ namespace APIServerStudy.Repository;
 
 public partial class DB
 {
-    public async Task<(ErrorCode, UpgradeData?)> GetUpgradeData(int upgradeID)
+    public async Task<(ErrorCode, UpgradeData?)> GetMasterUpgradeData(int upgradeID)
     {
-        var upgradeData = await _queryFactory.Query("gamedb.user_loginstate").Where("upgrade_id", upgradeID).FirstOrDefaultAsync<UpgradeData>();
+        var upgradeData = await _queryFactory.Query("gamedb.master_upgrade_list").Where("upgrade_id", upgradeID).FirstOrDefaultAsync<UpgradeData>();
         if(upgradeData == null)
         {
             return (ErrorCode.DataNotFound, null);
@@ -18,7 +18,7 @@ public partial class DB
 
     public async Task<(ErrorCode, int)> GetUserUpgradeLevel(long uid, int upgradeID)
     {
-        var upgradeLevel = await _queryFactory.Query("gamedb.user_loginstate").Where("uid", uid).Where("upgrade_id", upgradeID).FirstOrDefaultAsync<int?>();
+        var upgradeLevel = await _queryFactory.Query("gamedb.user_upgrade_states").Where("uid", uid).Where("upgrade_id", upgradeID).FirstOrDefaultAsync<int?>();
         if(upgradeLevel == null)
         {
             return (ErrorCode.DataNotFound, 0);
@@ -36,7 +36,7 @@ public partial class DB
         return (ErrorCode.None, userCredit.Value);
     }
 
-    public async Task<ErrorCode> UpdateUserData(long uid, int credit, int upgradeID, int level, bool isUnlock)
+    public async Task<ErrorCode> UpdateUserUpgradeData(long uid, int credit, int upgradeID, int level, bool isUnlock)
     {
         var transaction = _connection.BeginTransaction();
 

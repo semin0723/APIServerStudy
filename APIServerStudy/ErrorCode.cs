@@ -15,6 +15,7 @@
 
         InvalidAttendanceDate = 4001,
         DataNotFound = 4002,
+        UpgradeLevelMismatch = 4003,
 
         NotEnoughCredit = 5001,
 
