@@ -19,9 +19,16 @@ public partial class DB
         return (ErrorCode.None, upgrades);
     }
 
+    public async Task<(ErrorCode, List<UserUpgradeData>)> LoadUserUpgradeData(long uid)
+    {
+        var userUpgradeData = await _queryFactory.Query("gamedb.user_upgrade_states").Where("uid", uid).GetAsync<UserUpgradeData>();
+        List<UserUpgradeData> upgrades = userUpgradeData.ToList();
+        return (ErrorCode.None, upgrades);
+    }
+
     public async Task<(ErrorCode, UserGoodsData?)> LoadUserGoodsData(long uid)
     {
-        var userGoodsData = await _queryFactory.Query("gamedb.users").Where("uid", uid).FirstOrDefaultAsync<UserGoodsData>();
+        var userGoodsData = await _queryFactory.Query("gamedb.user_goods").Where("uid", uid).FirstOrDefaultAsync<UserGoodsData>();
         if (userGoodsData == null)
         {
             return (ErrorCode.InvalidUserID, null);

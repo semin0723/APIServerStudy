@@ -24,13 +24,14 @@ namespace APIServerStudy.Repository
         public Task<(ErrorCode, List<AttendanceReward>)> LoadAttendanceReward();
         public Task<(ErrorCode, List<UpgradeData>)> LoadUpgradeData();
         public Task<(ErrorCode, UserGoodsData?)> LoadUserGoodsData(long uid);
+        public Task<(ErrorCode, List<UserUpgradeData>)> LoadUserUpgradeData(long uid);
 
         // ### DataLoad End ###
 
         // ### Attendance ###
         public Task<(ErrorCode, UserAttendanceInfo?)> GetAttendance(long uid);
         public Task<(ErrorCode, AttendanceReward?)> GetAttendanceReward(int attendanceDate);
-        public Task<ErrorCode> UpdateAttendance(long uid, int attendanceDate);
+        public Task<ErrorCode> UpdateAttendance(long uid, int attendanceDate, IDbTransaction transaction);
         // ### Attendance End ###
 
         // ### Game Data ###

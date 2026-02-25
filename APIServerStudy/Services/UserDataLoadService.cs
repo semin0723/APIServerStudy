@@ -42,6 +42,8 @@ public class UserDataLoadService : IUserDataLoadService
             return (errorCode, null); 
         }
 
+        (errorCode, var userUpgradeData) = await _gameDB.LoadUserUpgradeData(uid);
+
         var lastAttendanceDay = userAttendanceInfo.last_attendance.Day;
 
         bool alreadyAttendance = false;
@@ -50,13 +52,16 @@ public class UserDataLoadService : IUserDataLoadService
             alreadyAttendance = true;
         }
 
+        await _gameDB.RefreshRequestTime(uid);
+
         return (errorCode, new DataLoadResponse
         {
             errorCode = errorCode,
-            attendanceRewards = masterAttendanceRewards,
-            attendanceCount = userAttendanceInfo.attendance_count,
-            upgradeData = masterUpgradeData,
             canAttendance = !alreadyAttendance,
+            attendanceCount = userAttendanceInfo.attendance_count,
+            attendanceRewards = masterAttendanceRewards,
+            upgradeData = masterUpgradeData,
+            userUpgradeData = userUpgradeData,
             goodsData = userGoodsData
         });
     }

@@ -53,6 +53,8 @@ public class UpgradeService : IUpgradeService
                 return (errorCode, null);
             }
 
+            await _gameDB.RefreshRequestTime(uid);
+
             return (ErrorCode.None, new UpgradeResponse
             {
                 errorCode = ErrorCode.None,
@@ -82,6 +84,8 @@ public class UpgradeService : IUpgradeService
                 _logger.ZLogError($"Failed to update user data for uid: {uid} after upgrade. ErrorCode: {errorCode}");
                 return (errorCode, null);
             }
+
+            await _gameDB.RefreshRequestTime(uid);
 
             return (ErrorCode.None, new UpgradeResponse
             {

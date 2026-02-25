@@ -12,5 +12,5 @@ public class AttendanceResponse
 {
     public ErrorCode errorCode { get; set; }
     public int attendanceDay { get; set; }
-    public AttendanceReward reward { get; set; }
+    public int updatedCredit { get; set; }
 }

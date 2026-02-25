@@ -19,22 +19,22 @@ public partial class DB
 
     public async Task<(ErrorCode, int)> GetUserUpgradeLevel(long uid, int upgradeID)
     {
-        var upgradeLevel = await _queryFactory.Query("gamedb.user_upgrade_states").Where("uid", uid).Where("upgrade_id", upgradeID).FirstOrDefaultAsync<int?>();
-        if(upgradeLevel == null)
+        var upgradeData = await _queryFactory.Query("gamedb.user_upgrade_states").Where("uid", uid).Where("upgrade_id", upgradeID).FirstOrDefaultAsync<UserUpgradeData>();
+        if(upgradeData == null)
         {
             return (ErrorCode.DataNotFound, 0);
         }
-        return (ErrorCode.None, upgradeLevel.Value);
+        return (ErrorCode.None, upgradeData.upgrade_level);
     }
 
     public async Task<(ErrorCode, int)> GetUserCredit(long uid)
     {
-        var userCredit = await _queryFactory.Query("gamedb.user_goods").Where("uid", uid).FirstOrDefaultAsync<int?>();
+        var userCredit = await _queryFactory.Query("gamedb.user_goods").Where("uid", uid).FirstOrDefaultAsync<UserGoodsData>();
         if (userCredit == null)
         {
             return (ErrorCode.DataNotFound, 0);
         }
-        return (ErrorCode.None, userCredit.Value);
+        return (ErrorCode.None, userCredit.credit);
     }
 
     public async Task<ErrorCode> UpdateUserUpgradeData(long uid, int credit, int upgradeID, int level, bool isUnlock)

@@ -57,7 +57,7 @@ public class AttendanceService : IAttendanceService
         errorCode = await _gameDB.Transaction(
             async (IDbTransaction transaction) =>
             {
-                ErrorCode errorCode = await _gameDB.UpdateAttendance(uid, attendanceDay);
+                ErrorCode errorCode = await _gameDB.UpdateAttendance(uid, attendanceDay, transaction);
                 if(errorCode != ErrorCode.None)
                 {
                     _logger.ZLogInformation($"[Attendance] Error: Failed to Update Attendance Info, UID: {uid}, AttendanceDay: {attendanceDay}");
@@ -80,12 +80,14 @@ public class AttendanceService : IAttendanceService
             return (errorCode, null);
         }
 
+        await _gameDB.RefreshRequestTime(uid);
+
         _logger.ZLogInformation($"[Attendance] Success, UID: {uid}, AttendanceDay: {attendanceDay}, Reward: {reward}");
         return (ErrorCode.None, new AttendanceResponse
         {
             errorCode = ErrorCode.None,
             attendanceDay = attendanceDay,
-            reward = reward
+            updatedCredit = newCredit
         });
     }
 }

@@ -33,9 +33,9 @@ public partial class DB
         return (ErrorCode.None, reward);
     }
 
-    public async Task<ErrorCode> UpdateAttendance(long uid, int attendanceDate)
+    public async Task<ErrorCode> UpdateAttendance(long uid, int attendanceDate, IDbTransaction transaction)
     {
-        var result = await _queryFactory.Query("gamedb.user_attendance").Where("uid", uid).UpdateAsync(new { attendance_count = attendanceDate, last_attendance = DateTime.Now });
+        var result = await _queryFactory.Query("gamedb.user_attendance").Where("uid", uid).UpdateAsync(new { attendance_count = attendanceDate, last_attendance = DateTime.Now }, transaction: transaction);
         if (result == 0)
         {
             return ErrorCode.UpdateFailed;
