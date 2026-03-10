@@ -1,4 +1,6 @@
-﻿using APIServerStudy.Repository;
+﻿using APIServerStudy.DTO;
+using APIServerStudy.Repository;
+using APIServerStudy.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ZLogger;
@@ -9,22 +11,21 @@ namespace APIServerStudy.Controllers
     [ApiController]
     public class LogoutController : ControllerBase
     {
-        private readonly IGameDB _gamedb;
+        private readonly IAuthService _authService;
         private readonly ILogger<LogoutController> _logger;
 
-        public LogoutController(IGameDB gamedb, ILogger<LogoutController> logger)
+        public LogoutController(IAuthService authService, ILogger<LogoutController> logger)
         {
-            _gamedb = gamedb;
+            _authService = authService;
             _logger = logger;
         }
 
         [HttpPost]
-        public async Task Post([FromHeader] RequestHeader requestHeader)
+        public async Task Post(LogoutRequest logoutRequest)
         {
-            long uid = long.Parse(requestHeader.uid);
-            _logger.ZLogInformation($"[Request Logout] uid: {uid}");
+            _logger.ZLogInformation($"[Request Logout] uid: {logoutRequest.uid}");
 
-            (ErrorCode code, bool result) = await _gamedb.UserLogout(uid);
+            ErrorCode code = await _authService.Logout(logoutRequest.uid);
 
             return;
         }

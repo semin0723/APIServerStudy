@@ -1,4 +1,6 @@
-﻿using APIServerStudy.Repository;
+﻿using APIServerStudy.DTO;
+using APIServerStudy.Repository;
+using APIServerStudy.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ZLogger;
@@ -9,43 +11,27 @@ namespace APIServerStudy.Controllers
     [ApiController]
     public class LoadUserDataController : ControllerBase
     {
-        private readonly IGameDB _gameDB;
+        private readonly IUserDataLoadService _dataLoadService;
         private readonly ILogger<LoadUserDataController> _logger;
 
-        public LoadUserDataController(ILogger<LoadUserDataController> logger, IGameDB gameDB)
+        public LoadUserDataController(ILogger<LoadUserDataController> logger, IUserDataLoadService dataLoadService)
         {
-            _gameDB = gameDB;
+            _dataLoadService = dataLoadService;
             _logger = logger;
         }
 
         [HttpPost]
-        public async Task<ResponseGameUserData> Post([FromHeader] RequestHeader header)
+        public async Task<DataLoadResponse> Post(DataLoadRequest request)
         {
-            long uid = long.Parse(header.uid);
+            _logger.ZLogInformation($"[Request UserData] UID: {request.uid}");
 
-            _logger.ZLogInformation($"[Request UserData] UID: {uid}");
-
-            (ErrorCode code, ResponseGameUserData gameUserData) = await _gameDB.GetGameUserData(uid);
+            (ErrorCode code, DataLoadResponse? gameUserData) = await _dataLoadService.LoadData(request.uid);
             if(code == ErrorCode.None)
             {
                 return gameUserData;
             }
 
-            return new ResponseGameUserData();
+            return new DataLoadResponse { errorCode = code };
         }
-    }
-
-    public class RequestHeader
-    {
-        [FromHeader]
-        public string uid { get; set; }
-    }
-
-    public class ResponseGameUserData
-    {
-        public int maxHp { get; set; }
-        public int maxMp { get; set; }
-        public int attackPower { get; set; }
-        public int defence { get; set; }
     }
 }
