@@ -27,7 +27,7 @@ namespace APIServerStudy.Controllers
 
             var response = new RegisterResponse();
 
-            response.RegisterResult = (int)errorCode;
+            response.errorCode = errorCode;
             return response;
         }
     }
@@ -39,6 +39,6 @@ namespace APIServerStudy.Controllers
     }   
     public class RegisterResponse
     {
-        public int RegisterResult { get; set; }
+        public ErrorCode errorCode { get; set; }
     }
 }

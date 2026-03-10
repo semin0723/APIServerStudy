@@ -26,11 +26,9 @@ namespace APIServerStudy.Controllers
 
             // DB Check Has User and Send Result.
             (ErrorCode errorCode, long uid) = await _gameDB.AuthCheck(request.UserID, request.Password);
-            if(errorCode != 0)
-            {
-                response.LoginResult = (int)errorCode;
-                return response;
-            }
+
+            response.errorCode = errorCode;
+            response.uid = uid;
 
             return response;
         }
@@ -44,6 +42,7 @@ namespace APIServerStudy.Controllers
 
     public class LoginResponse
     {
-        public int LoginResult { get; set; }
+        public ErrorCode errorCode { get; set; }
+        public long uid { get; set; }
     }
 }
